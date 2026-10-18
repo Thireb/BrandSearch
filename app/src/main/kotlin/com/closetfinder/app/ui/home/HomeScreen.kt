@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -55,6 +56,7 @@ import com.closetfinder.app.data.Item
 fun HomeScreen(
     onAddItem: () -> Unit,
     onOpenItem: (Long) -> Unit,
+    onImageSearch: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val items by viewModel.items.collectAsState()
@@ -63,7 +65,16 @@ fun HomeScreen(
     val storeOptions by viewModel.storeOptions.collectAsState()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Closet Finder") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Closet Finder") },
+                actions = {
+                    IconButton(onClick = onImageSearch) {
+                        Icon(Icons.Filled.ImageSearch, contentDescription = "Search by image")
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddItem) {
                 Icon(Icons.Filled.Add, contentDescription = "Add item")

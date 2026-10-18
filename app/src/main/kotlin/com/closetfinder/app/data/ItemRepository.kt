@@ -1,14 +1,23 @@
 package com.closetfinder.app.data
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.closetfinder.app.embed.Embedder
 import com.closetfinder.app.util.CodeGenerator
+import com.closetfinder.app.util.CosineSimilarity
+import com.closetfinder.app.util.EmbeddingCodec
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 private val CODE_PATTERN = Regex("^[A-Za-z]+\\d+$")
 
 class ItemRepository(
     private val dao: ItemDao,
     private val ftsDao: ItemFtsDao,
+    private val embedder: Embedder,
+    private val externalScope: CoroutineScope,
 ) {
 
     fun observeAll(): Flow<List<Item>> = dao.observeAll()
@@ -69,6 +78,7 @@ class ItemRepository(
         )
         val id = dao.insert(item)
         indexForSearch(item.copy(id = id))
+        embedInBackground(id, imagePath)
         return id
     }
 
@@ -81,6 +91,34 @@ class ItemRepository(
     suspend fun delete(item: Item) {
         dao.delete(item)
         ftsDao.deleteByItemId(item.id)
+    }
+
+    suspend fun embedImage(bitmap: Bitmap): FloatArray = embedder.embed(bitmap)
+
+    suspend fun searchBySimilarity(queryEmbedding: FloatArray, topN: Int = 5): List<Pair<Item, Float>> =
+        dao.getAllWithEmbeddings()
+            .mapNotNull { item -> item.embedding?.let { item to CosineSimilarity.of(queryEmbedding, EmbeddingCodec.decode(it)) } }
+            .sortedByDescending { it.second }
+            .take(topN)
+
+    /** Embeds anything missing an embedding, or embedded by an older model version. Runs in the background. */
+    fun reembedStaleItemsAsync() {
+        externalScope.launch {
+            dao.getItemsNeedingEmbedding(embedder.modelVersion).forEach { item ->
+                embedInBackground(item.id, item.imagePath)
+            }
+        }
+    }
+
+    /** Fire-and-forget: keeps add-item fast (<10s) by not blocking the save on embedding compute. */
+    private fun embedInBackground(itemId: Long, imagePath: String) {
+        externalScope.launch {
+            val bitmap = BitmapFactory.decodeFile(imagePath) ?: return@launch
+            val vector = embedder.embed(bitmap)
+            bitmap.recycle()
+            val current = dao.getById(itemId) ?: return@launch
+            dao.update(current.copy(embedding = EmbeddingCodec.encode(vector), modelVersion = embedder.modelVersion))
+        }
     }
 
     private suspend fun indexForSearch(item: Item) {

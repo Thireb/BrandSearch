@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.closetfinder.app.ui.additem.AddItemScreen
 import com.closetfinder.app.ui.detail.ItemDetailScreen
 import com.closetfinder.app.ui.home.HomeScreen
+import com.closetfinder.app.ui.imagesearch.ImageSearchScreen
 
 @Composable
 fun ClosetFinderNavGraph() {
@@ -18,6 +19,14 @@ fun ClosetFinderNavGraph() {
         composable(Routes.HOME) {
             HomeScreen(
                 onAddItem = { navController.navigate(Routes.ADD_ITEM) },
+                onOpenItem = { id -> navController.navigate(Routes.itemDetail(id)) },
+                onImageSearch = { navController.navigate(Routes.IMAGE_SEARCH) },
+            )
+        }
+
+        composable(Routes.IMAGE_SEARCH) {
+            ImageSearchScreen(
+                onBack = { navController.popBackStack() },
                 onOpenItem = { id -> navController.navigate(Routes.itemDetail(id)) },
             )
         }

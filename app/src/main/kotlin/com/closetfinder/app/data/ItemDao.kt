@@ -49,6 +49,9 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE embedding IS NOT NULL")
     suspend fun getAllWithEmbeddings(): List<Item>
 
+    @Query("SELECT * FROM items WHERE embedding IS NULL OR modelVersion != :modelVersion")
+    suspend fun getItemsNeedingEmbedding(modelVersion: Int): List<Item>
+
     @Insert
     suspend fun insert(item: Item): Long
 
