@@ -9,9 +9,10 @@ import com.closetfinder.app.ui.theme.ClosetFinderTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val sharedImage = SharedImageIntent.from(intent)
         setContent {
             ClosetFinderTheme {
-                ClosetFinderNavGraph()
+                ClosetFinderNavGraph(sharedImage = sharedImage)
             }
         }
     }

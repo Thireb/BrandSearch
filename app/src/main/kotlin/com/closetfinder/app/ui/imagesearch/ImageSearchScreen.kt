@@ -1,5 +1,6 @@
 package com.closetfinder.app.ui.imagesearch
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,6 +47,7 @@ import com.closetfinder.app.data.Item
 fun ImageSearchScreen(
     onBack: () -> Unit,
     onOpenItem: (Long) -> Unit,
+    initialUri: Uri? = null,
     viewModel: ImageSearchViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -54,8 +56,12 @@ fun ImageSearchScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri -> uri?.let(viewModel::search) ?: onBack() }
 
-    LaunchedEffect(Unit) {
-        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    LaunchedEffect(initialUri) {
+        if (initialUri != null) {
+            viewModel.search(initialUri)
+        } else {
+            pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
     }
 
     Scaffold(

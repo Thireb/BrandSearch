@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,7 @@ import coil.compose.AsyncImage
 fun AddItemScreen(
     onBack: () -> Unit,
     onSaved: () -> Unit,
+    initialUri: android.net.Uri? = null,
     viewModel: AddItemViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -69,6 +71,10 @@ fun AddItemScreen(
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri -> uri?.let(viewModel::onImagePicked) }
+
+    LaunchedEffect(initialUri) {
+        initialUri?.let(viewModel::onImagePicked)
+    }
 
     Scaffold(
         topBar = {

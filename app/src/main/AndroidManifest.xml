@@ -19,6 +19,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Share-sheet target: "Add to Closet Finder" from WhatsApp/Gallery/etc. -->
+        <activity-alias
+            android:name=".ShareAddItem"
+            android:targetActivity=".MainActivity"
+            android:label="Add to Closet Finder"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Share-sheet target: "Find in Closet Finder" for a customer's screenshot. -->
+        <activity-alias
+            android:name=".ShareFindItem"
+            android:targetActivity=".MainActivity"
+            android:label="Find in Closet Finder"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity-alias>
     </application>
 
 </manifest>
