@@ -12,6 +12,6 @@ class ClosetFinderApp : Application() {
     override fun onCreate() {
         super.onCreate()
         val database = AppDatabase.getInstance(this)
-        repository = ItemRepository(database.itemDao())
+        repository = ItemRepository(database.itemDao(), database.itemFtsDao())
     }
 }

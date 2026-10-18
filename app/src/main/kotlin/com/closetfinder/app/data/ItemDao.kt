@@ -25,6 +25,30 @@ interface ItemDao {
     @Query("SELECT tags FROM items")
     fun observeTagsColumn(): Flow<List<String>>
 
+    @Query("SELECT * FROM items WHERE code = :code COLLATE NOCASE LIMIT 1")
+    suspend fun getByCode(code: String): Item?
+
+    @Query("SELECT * FROM items WHERE id IN (:ids) ORDER BY createdAt DESC")
+    suspend fun getByIds(ids: List<Long>): List<Item>
+
+    @Query(
+        "SELECT * FROM items WHERE " +
+            "(:store IS NULL OR store = :store) AND " +
+            "(:minPrice IS NULL OR COALESCE(salePrice, price) >= :minPrice) AND " +
+            "(:maxPrice IS NULL OR COALESCE(salePrice, price) <= :maxPrice) AND " +
+            "(:since IS NULL OR createdAt >= :since) " +
+            "ORDER BY createdAt DESC",
+    )
+    fun observeFiltered(
+        store: String?,
+        minPrice: Int?,
+        maxPrice: Int?,
+        since: Long?,
+    ): Flow<List<Item>>
+
+    @Query("SELECT * FROM items WHERE embedding IS NOT NULL")
+    suspend fun getAllWithEmbeddings(): List<Item>
+
     @Insert
     suspend fun insert(item: Item): Long
 
