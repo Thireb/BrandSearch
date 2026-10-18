@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.closetfinder.app.SharedImageIntent
 import com.closetfinder.app.ui.additem.AddItemScreen
+import com.closetfinder.app.ui.backup.BackupScreen
 import com.closetfinder.app.ui.detail.ItemDetailScreen
 import com.closetfinder.app.ui.home.HomeScreen
 import com.closetfinder.app.ui.imagesearch.ImageSearchScreen
@@ -31,7 +32,12 @@ fun ClosetFinderNavGraph(sharedImage: SharedImageIntent? = null) {
                 onAddItem = { navController.navigate(Routes.ADD_ITEM) },
                 onOpenItem = { id -> navController.navigate(Routes.itemDetail(id)) },
                 onImageSearch = { navController.navigate(Routes.IMAGE_SEARCH) },
+                onBackup = { navController.navigate(Routes.BACKUP) },
             )
+        }
+
+        composable(Routes.BACKUP) {
+            BackupScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.IMAGE_SEARCH) {

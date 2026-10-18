@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ImageSearch
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -57,12 +58,14 @@ fun HomeScreen(
     onAddItem: () -> Unit,
     onOpenItem: (Long) -> Unit,
     onImageSearch: () -> Unit,
+    onBackup: () -> Unit,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val items by viewModel.items.collectAsState()
     val query by viewModel.query.collectAsState()
     val filters by viewModel.filters.collectAsState()
     val storeOptions by viewModel.storeOptions.collectAsState()
+    var overflowOpen by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -71,6 +74,20 @@ fun HomeScreen(
                 actions = {
                     IconButton(onClick = onImageSearch) {
                         Icon(Icons.Filled.ImageSearch, contentDescription = "Search by image")
+                    }
+                    Box {
+                        IconButton(onClick = { overflowOpen = true }) {
+                            Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                        }
+                        DropdownMenu(expanded = overflowOpen, onDismissRequest = { overflowOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text("Backup") },
+                                onClick = {
+                                    overflowOpen = false
+                                    onBackup()
+                                },
+                            )
+                        }
                     }
                 },
             )
