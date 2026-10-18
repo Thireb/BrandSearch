@@ -1,0 +1,41 @@
+### Android / Gradle ###
+*.apk
+*.aab
+*.ap_
+*.aar
+*.dex
+*.class
+
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# Local config (contains machine-specific SDK path)
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.navigation/
+captures/
+.cxx/
+*.hprof
+
+# Keystore (never commit signing material)
+*.jks
+*.keystore
+keystore.properties
+
+# Build output helper script artifacts
+build-output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python (design-skill scripts)
+__pycache__/
+*.pyc

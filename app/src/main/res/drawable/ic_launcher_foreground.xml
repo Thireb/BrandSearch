@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Price tag silhouette -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,30 L74,30 Q82,30 82,38 L82,70 Q82,78 74,78 L34,78 Q26,78 26,70 L26,38 Q26,30 34,30 Z" />
+
+    <!-- Punched hole, colored to match the background layer -->
+    <path
+        android:fillColor="@color/ic_launcher_background"
+        android:pathData="M40,44 m -5,0 a 5,5 0 1 0 10,0 a 5,5 0 1 0 -10,0" />
+</vector>
