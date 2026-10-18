@@ -28,6 +28,9 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE code = :code COLLATE NOCASE LIMIT 1")
     suspend fun getByCode(code: String): Item?
 
+    @Query("SELECT * FROM items WHERE code LIKE '%' || :fragment || '%' COLLATE NOCASE ORDER BY createdAt DESC")
+    suspend fun searchByCodeFragment(fragment: String): List<Item>
+
     @Query("SELECT * FROM items WHERE id IN (:ids) ORDER BY createdAt DESC")
     suspend fun getByIds(ids: List<Long>): List<Item>
 

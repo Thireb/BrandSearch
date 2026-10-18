@@ -41,7 +41,11 @@ class ItemRepository(
 
     suspend fun getById(id: Long): Item? = dao.getById(id)
 
-    /** Direct code lookup (e.g. "A023") or, failing that, an FTS prefix search over code/store/tags/notes. */
+    /**
+     * Direct code lookup (e.g. "A023"), a partial-code match (e.g. "001" or "23" finds "A023" -
+     * FTS tokenizes "A023" as one alphanumeric token, so a numeric prefix query never matches it),
+     * and an FTS prefix search over code/store/tags/notes.
+     */
     suspend fun search(query: String): List<Item> {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
@@ -50,14 +54,19 @@ class ItemRepository(
             dao.getByCode(trimmed)?.let { return listOf(it) }
         }
 
+        val codeMatches = dao.searchByCodeFragment(trimmed)
+
         val ftsQuery = trimmed.split(Regex("\\s+"))
             .filter { it.isNotBlank() }
             .joinToString(" ") { token -> token.replace("\"", "") + "*" }
-        if (ftsQuery.isBlank()) return emptyList()
+        val ftsMatches = if (ftsQuery.isBlank()) {
+            emptyList()
+        } else {
+            val ids = ftsDao.search(ftsQuery)
+            if (ids.isEmpty()) emptyList() else dao.getByIds(ids)
+        }
 
-        val ids = ftsDao.search(ftsQuery)
-        if (ids.isEmpty()) return emptyList()
-        return dao.getByIds(ids)
+        return (codeMatches + ftsMatches).distinctBy { it.id }
     }
 
     suspend fun addItem(
