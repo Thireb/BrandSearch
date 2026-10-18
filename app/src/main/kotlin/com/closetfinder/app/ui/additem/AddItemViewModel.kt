@@ -37,6 +37,15 @@ class AddItemViewModel(application: Application) : AndroidViewModel(application)
     val storeSuggestions: StateFlow<List<String>> = repository.observeStores()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    init {
+        // She usually buys a batch from one store at a time, so default to it to save a tap.
+        viewModelScope.launch {
+            repository.getLastUsedStore()?.let { store ->
+                _uiState.value = _uiState.value.copy(store = store)
+            }
+        }
+    }
+
     val tagSuggestions: StateFlow<List<String>> = repository.observeTags()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 

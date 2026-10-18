@@ -24,6 +24,8 @@ class ItemRepository(
 
     fun observeStores(): Flow<List<String>> = dao.observeStores()
 
+    suspend fun getLastUsedStore(): String? = dao.getMostRecent()?.store
+
     fun observeTags(): Flow<List<String>> = dao.observeTagsColumn().map { columns ->
         columns.asSequence()
             .flatMap { it.split(',') }
